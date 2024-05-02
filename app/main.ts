@@ -29,7 +29,7 @@ const parsePath = (path: string): string => {
 
     if (echoContent !== null) content = echoContent[2];
 
-    return `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Lenght: ${content.length}\r\n\r\n${content}\r\n`;
+    return `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${content.length}\r\n\r\n${content}\r\n`;
   }
   return 'HTTP/1.1 404 Not Found\r\n\r\n';
 };
