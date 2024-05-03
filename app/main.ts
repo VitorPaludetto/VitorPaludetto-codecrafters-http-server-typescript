@@ -103,9 +103,8 @@ const createResponse = (
   let response = '';
 
   response += `HTTP/1.1 ${status}\r\n`;
-  if (contentLength > 0) {
-    response += `Content-Type: ${contentType}\r\nContent-Length: ${contentLength}\r\n\r\n`;
-  }
+  response += `Content-Type: ${contentType}\r\nContent-Length: ${contentLength}\r\n\r\n`;
+
   if (body) {
     response += `${body}`;
   }
