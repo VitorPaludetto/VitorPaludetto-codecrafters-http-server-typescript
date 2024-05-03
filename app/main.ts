@@ -3,6 +3,7 @@ import * as net from 'net';
 
 enum responseStatus {
   OK = '200 OK',
+  Created = '201 Created',
   NotFound = '404 Not Found',
 }
 
@@ -73,6 +74,26 @@ const server: net.Server = net.createServer((socket: net.Socket) => {
             },
             fileContent
           )
+        );
+      } catch (err) {
+        console.error(err);
+        socket.write(
+          createResponse(responseStatus.NotFound, {
+            contentType: 'application/octet-stream',
+            contentLength: 0,
+          })
+        );
+      }
+    } else if (request.path.startsWith('/files') && request.method === 'POST') {
+      const fileName = parsePath(request.path, /(\/files\/)(.*)/);
+
+      try {
+        fs.writeFileSync(`${dir}/${fileName}`, request.body);
+        socket.write(
+          createResponse(responseStatus.Created, {
+            contentType: 'application/octet-stream',
+            contentLength: 0,
+          })
         );
       } catch (err) {
         console.error(err);
