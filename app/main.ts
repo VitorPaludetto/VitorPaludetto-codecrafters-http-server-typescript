@@ -1,3 +1,4 @@
+import fs from 'fs';
 import * as net from 'net';
 
 enum responseStatus {
@@ -9,6 +10,15 @@ type responseHeaders = {
   contentType: string;
   contentLength: number;
 };
+
+let dir: string;
+
+const args = process.argv;
+args.forEach((arg, index) => {
+  if (arg.includes('directory') && args[index + 1].length > 0) {
+    dir = args[index + 1];
+  }
+});
 
 const server: net.Server = net.createServer((socket: net.Socket) => {
   socket.on('close', () => {
@@ -49,6 +59,30 @@ const server: net.Server = net.createServer((socket: net.Socket) => {
           content
         )
       );
+    } else if (request.path.startsWith('/files') && request.method === 'GET') {
+      const fileName = parsePath(request.path, /(\/files\/)(.*)/);
+
+      try {
+        const fileContent = fs.readFileSync(`${dir}/${fileName}`, 'utf-8');
+        socket.write(
+          createResponse(
+            responseStatus.OK,
+            {
+              contentType: 'application/octet-stream',
+              contentLength: fileContent.length,
+            },
+            fileContent
+          )
+        );
+      } catch (err) {
+        console.error(err);
+        socket.write(
+          createResponse(responseStatus.NotFound, {
+            contentType: 'application/octet-stream',
+            contentLength: 0,
+          })
+        );
+      }
     } else {
       socket.write(
         createResponse(responseStatus.NotFound, {
